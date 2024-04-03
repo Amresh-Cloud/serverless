@@ -12,7 +12,7 @@ const mailgunClient = mailgunFormData.client({
   key:  process.env.MAILGUN_API_KEY,
 });
 
-exports.sendemail = async (event, context) => {
+exports.sendemail = async (event) => {
   console.log("trying");
   try {
     console.log("extracting message from pubsub");
@@ -23,7 +23,7 @@ exports.sendemail = async (event, context) => {
 
     const userEmailAddress = payload.username;
     const userId=payload.id;
-    const verificationLink=`http://${process.env.DOMAIN_NAME}:2500/v1/user/verify?id=${userId}`;
+    const verificationLink=`https://${process.env.DOMAIN_NAME}/v1/user/verify?id=${userId}`;
     console.log(verificationLink);
 
     const mailOptions = {
@@ -39,7 +39,7 @@ exports.sendemail = async (event, context) => {
     console.log('Email Succefully sent:', response);
     if (response.id) {
  
-      const user = await User.findOne({ where: { username: userEmail } });
+      const user = await User.findOne({ where: { username: userEmailAddress } });
       if (user) {
         await user.update({ token_sent_timestamp: new Date() });
         console.log('User updated with token_sent_timestamp:', user.toJSON());
